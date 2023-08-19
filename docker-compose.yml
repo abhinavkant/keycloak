@@ -1,0 +1,41 @@
+version: '3'
+
+volumes:
+  postgres_data:
+      driver: local
+
+services:
+  postgres:
+      image: postgres
+      volumes:
+        - postgres_data:/var/lib/postgresql/data
+      environment:
+        POSTGRES_DB: keycloak
+        POSTGRES_USER: keycloak
+        POSTGRES_PASSWORD: password
+  # adminer:
+  #   image: adminer
+  #   restart: always
+  #   ports:
+  #     - 8011:8080
+  keycloak:
+      image: quay.io/keycloak/keycloak:22.0.1
+      command:
+        - --config-file=/opt/keycloak/conf/keycloak.conf
+        - start
+        - --hostname=local.host.dev
+        - --hostname-strict=false
+      environment:
+        KEYCLOAK_USER: admin
+        KEYCLOAK_PASSWORD: password
+        PROXY_ADDRESS_FORWARDING: 'true'
+        KEYCLOAK_ADMIN: admin
+        KEYCLOAK_ADMIN_PASSWORD: password
+      ports:
+        - 8010:8010
+      volumes:
+        - ./ssl/local.host.dev+3.pem:/opt/keycloak/certs/server.pem
+        - ./ssl/local.host.dev+3-key.pem:/opt/keycloak/certs/server.key.pem
+        - ./conf/keycloak.conf:/opt/keycloak/conf/keycloak.conf
+      depends_on:
+        - postgres
