@@ -25,6 +25,7 @@ services:
         - start
         - --hostname=local.host.dev
         - --hostname-strict=false
+        - --log-level=ALL
       environment:
         KEYCLOAK_USER: admin
         KEYCLOAK_PASSWORD: password
